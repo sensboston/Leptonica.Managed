@@ -54,6 +54,21 @@ namespace BitMiracle.LibJpeg.Classic
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
+        /* Direct access to the buffer for the fast Huffman encoder */
+        internal byte[] InternalBuffer => m_buffer;
+
+        internal int InternalPosition
+        {
+            get => m_position;
+            set => m_position = value;
+        }
+
+        internal int InternalFree
+        {
+            get => m_free_in_buffer;
+            set => m_free_in_buffer = value;
+        }
+
         protected void initInternalBuffer(byte[] buffer, int offset)
         {
             m_buffer = buffer;

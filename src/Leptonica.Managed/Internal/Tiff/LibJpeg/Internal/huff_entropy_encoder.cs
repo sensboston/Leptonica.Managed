@@ -21,7 +21,7 @@ namespace BitMiracle.LibJpeg.Classic.Internal
     /// <summary>
     /// Expanded entropy encoder object for Huffman encoding.
     /// </summary>
-    class huff_entropy_encoder : jpeg_entropy_encoder
+    partial class huff_entropy_encoder : jpeg_entropy_encoder
     {
         /* The legal range of a DCT coefficient is
          *  -1024 .. +1023  for 8-bit data;
@@ -84,6 +84,8 @@ namespace BitMiracle.LibJpeg.Classic.Internal
         private bool m_gather_statistics;
 
         private jpeg_compress_struct m_cinfo;
+
+        private FastBaselineEncoder m_fast;   /* baseline scan without restarts, or null */
 
         /* Coding status for AC components */
         private int ac_tbl_no;      /* the table number of the single component */
@@ -223,6 +225,14 @@ namespace BitMiracle.LibJpeg.Classic.Internal
             /* Initialize restart stuff */
             m_restarts_to_go = m_cinfo.m_restart_interval;
             m_next_restart_num = 0;
+
+            m_fast = null;
+            if (!m_cinfo.m_progressive_mode && !gather_statistics && FastBaselineEncoder.Applies(m_cinfo))
+            {
+                m_fast = new FastBaselineEncoder(m_cinfo, m_dc_derived_tbls, m_ac_derived_tbls);
+                encode_mcu = encode_mcu_fast;
+                finish_pass = finish_pass_fast;
+            }
         }
 
         /// <summary>
@@ -278,6 +288,17 @@ namespace BitMiracle.LibJpeg.Classic.Internal
             }
 
             return true;
+        }
+
+        private bool encode_mcu_fast(JBLOCK[][] MCU_data)
+        {
+            m_fast.EncodeMcu(MCU_data);
+            return true;
+        }
+
+        private void finish_pass_fast()
+        {
+            m_fast.Finish();
         }
 
         /// <summary>
