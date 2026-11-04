@@ -1,0 +1,13 @@
+* text=auto eol=lf
+*.cs text eol=lf
+*.sln text eol=crlf
+*.slnx text eol=lf
+*.png binary
+*.jpg binary
+*.tif binary
+*.gif binary
+*.webp binary
+*.jp2 binary
+*.bmp binary
+*.pnm binary
+*.pdf binary

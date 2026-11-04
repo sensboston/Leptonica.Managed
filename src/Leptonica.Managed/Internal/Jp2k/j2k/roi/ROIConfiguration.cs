@@ -1,0 +1,524 @@
+#nullable enable annotations
+#nullable disable warnings
+#pragma warning disable CS0618, CS0649, CS0168, CS0169, CS0219, CS0414, CS1591, CS8981, SYSLIB0011, SYSLIB0014
+// Copyright (c) 2025 Sjofn LLC.
+// Licensed under the BSD 3-Clause License.
+
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+
+namespace CoreJ2K.j2k.roi
+{
+    /// <summary>
+    /// Fluent API for configuring Region of Interest (ROI) encoding settings.
+    /// Provides a modern, developer-friendly interface for specifying ROI parameters.
+    /// </summary>
+    internal class ROIConfiguration
+    {
+        private readonly List<ROIDescriptor> _rois = new List<ROIDescriptor>();
+        
+        /// <summary>
+        /// Gets the list of configured ROI descriptors.
+        /// </summary>
+        public IReadOnlyList<ROIDescriptor> Regions => _rois.AsReadOnly();
+        
+        /// <summary>
+        /// Gets or sets whether to use block-aligned ROI encoding.
+        /// When enabled, entire code-blocks are treated as ROI if any coefficient belongs to the ROI.
+        /// Default is false.
+        /// </summary>
+        public bool BlockAligned { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the starting resolution level for ROI.
+        /// Forces the lowest N resolution levels to belong entirely to the ROI.
+        /// -1 deactivates this feature. Default is -1.
+        /// </summary>
+        public int StartLevel { get; set; } = -1;
+        
+        /// <summary>
+        /// Gets or sets whether to force generic mask generation even for rectangular ROIs.
+        /// When false (default), rectangular ROIs use optimized fast mask generation.
+        /// </summary>
+        public bool ForceGenericMaskGeneration { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the ROI scaling mode.
+        /// </summary>
+        public ROIScalingMode ScalingMode { get; set; } = ROIScalingMode.MaxShift;
+        
+        /// <summary>
+        /// Adds a rectangular ROI to the configuration.
+        /// </summary>
+        /// <param name="component">Component index (0-based) to apply ROI to, or -1 for all components</param>
+        /// <param name="x">X coordinate of upper-left corner</param>
+        /// <param name="y">Y coordinate of upper-left corner</param>
+        /// <param name="width">Width of the rectangle</param>
+        /// <param name="height">Height of the rectangle</param>
+        /// <returns>This configuration instance for method chaining</returns>
+        public ROIConfiguration AddRectangle(int component, int x, int y, int width, int height)
+        {
+            _rois.Add(new RectangularROI(component, x, y, width, height));
+            return this;
+        }
+        
+        /// <summary>
+        /// Adds a rectangular ROI using a Rectangle structure.
+        /// </summary>
+        /// <param name="component">Component index (0-based) to apply ROI to, or -1 for all components</param>
+        /// <param name="rect">Rectangle defining the ROI bounds</param>
+        /// <returns>This configuration instance for method chaining</returns>
+        public ROIConfiguration AddRectangle(int component, Rectangle rect)
+        {
+            return AddRectangle(component, rect.X, rect.Y, rect.Width, rect.Height);
+        }
+        
+        /// <summary>
+        /// Adds a circular ROI to the configuration.
+        /// </summary>
+        /// <param name="component">Component index (0-based) to apply ROI to, or -1 for all components</param>
+        /// <param name="centerX">X coordinate of circle center</param>
+        /// <param name="centerY">Y coordinate of circle center</param>
+        /// <param name="radius">Radius of the circle</param>
+        /// <returns>This configuration instance for method chaining</returns>
+        public ROIConfiguration AddCircle(int component, int centerX, int centerY, int radius)
+        {
+            _rois.Add(new CircularROI(component, centerX, centerY, radius));
+            return this;
+        }
+        
+        /// <summary>
+        /// Adds a circular ROI using a Point structure for the center.
+        /// </summary>
+        /// <param name="component">Component index (0-based) to apply ROI to, or -1 for all components</param>
+        /// <param name="center">Center point of the circle</param>
+        /// <param name="radius">Radius of the circle</param>
+        /// <returns>This configuration instance for method chaining</returns>
+        public ROIConfiguration AddCircle(int component, Point center, int radius)
+        {
+            return AddCircle(component, center.X, center.Y, radius);
+        }
+        
+        /// <summary>
+        /// Adds an arbitrary-shaped ROI from a PGM mask file.
+        /// </summary>
+        /// <param name="component">Component index (0-based) to apply ROI to, or -1 for all components</param>
+        /// <param name="maskFilePath">Path to PGM file containing the mask (non-zero = ROI)</param>
+        /// <returns>This configuration instance for method chaining</returns>
+        public ROIConfiguration AddArbitraryShape(int component, string maskFilePath)
+        {
+            if (string.IsNullOrWhiteSpace(maskFilePath))
+                throw new ArgumentException("Mask file path cannot be null or empty", nameof(maskFilePath));
+            
+            _rois.Add(new ArbitraryROI(component, maskFilePath));
+            return this;
+        }
+        
+        /// <summary>
+        /// Adds a region of any shape that is held in memory. See <see cref="ROIMask"/> for ways to make one, such as from the
+        /// convex hull of facial landmarks.
+        /// </summary>
+        /// <param name="component">Component index (0-based) to apply ROI to, or -1 for all components</param>
+        /// <param name="mask">The region; it must be as large as the image that is encoded.</param>
+        /// <returns>This configuration instance for method chaining</returns>
+        public ROIConfiguration AddMask(int component, ROIMask mask)
+        {
+            if (mask == null) throw new ArgumentNullException(nameof(mask));
+
+            _rois.Add(new MaskROI(component, mask));
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the block alignment mode.
+        /// </summary>
+        /// <param name="enabled">True to enable block-aligned ROI encoding</param>
+        /// <returns>This configuration instance for method chaining</returns>
+        public ROIConfiguration SetBlockAlignment(bool enabled)
+        {
+            BlockAligned = enabled;
+            return this;
+        }
+        
+        /// <summary>
+        /// Sets the starting resolution level for ROI.
+        /// </summary>
+        /// <param name="level">Resolution level (0 = lowest resolution, -1 to disable)</param>
+        /// <returns>This configuration instance for method chaining</returns>
+        public ROIConfiguration SetStartLevel(int level)
+        {
+            StartLevel = level;
+            return this;
+        }
+        
+        /// <summary>
+        /// Sets the ROI scaling mode.
+        /// </summary>
+        /// <param name="mode">The scaling mode to use</param>
+        /// <returns>This configuration instance for method chaining</returns>
+        public ROIConfiguration SetScalingMode(ROIScalingMode mode)
+        {
+            ScalingMode = mode;
+            return this;
+        }
+        
+        /// <summary>
+        /// Forces the use of generic mask generation even for rectangular ROIs.
+        /// </summary>
+        /// <param name="force">True to force generic mask generation</param>
+        /// <returns>This configuration instance for method chaining</returns>
+        public ROIConfiguration ForceGenericMask(bool force = true)
+        {
+            ForceGenericMaskGeneration = force;
+            return this;
+        }
+        
+        /// <summary>
+        /// Validates the configuration and returns any validation errors.
+        /// </summary>
+        /// <returns>List of validation error messages, empty if valid</returns>
+        public List<string> Validate()
+        {
+            var errors = new List<string>();
+            
+            if (_rois.Count == 0)
+            {
+                errors.Add("At least one ROI must be defined");
+            }
+            
+            if (StartLevel < -1)
+            {
+                errors.Add("StartLevel must be -1 or greater");
+            }
+            
+            foreach (var roi in _rois)
+            {
+                if (roi.Component < -1)
+                    errors.Add($"ROI component must be -1 (all components) or a 0-based index (got {roi.Component})");
+                var roiErrors = roi.Validate();
+                errors.AddRange(roiErrors);
+            }
+            
+            return errors;
+        }
+        
+        /// <summary>
+        /// Checks if the configuration is valid.
+        /// </summary>
+        public bool IsValid => Validate().Count == 0;
+
+        /// <summary>
+        /// Writes this configuration into the encoder parameter list as the <c>Rroi</c>,
+        /// <c>Rstart_level</c>, <c>Ralign</c> and <c>Rno_rect</c> options.
+        /// </summary>
+        /// <param name="pl">The parameter list to write into.</param>
+        internal void ApplyTo(CoreJ2K.j2k.util.ParameterList pl)
+        {
+            if (_rois.Count == 0) return;
+
+            // A component prefix in 'Rroi' stays in force until the next one, so the ROIs for
+            // all components go first (no prefix yet) and the rest follow grouped by component.
+            // In-memory masks travel with the parameter list; 'Rroi' refers to them by position.
+            var words = new List<string>();
+            pl.RoiMasks.Clear();
+            foreach (var roi in _rois)
+            {
+                if (roi.Component < 0) words.Add(roi.ToRroiString(pl.RoiMasks));
+            }
+            for (var c = 0; c < _rois.Count; c++)
+            {
+                var component = _rois[c].Component;
+                if (component < 0 || _rois.FindIndex(r => r.Component == component) != c) continue;
+                words.Add("c" + component.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                foreach (var roi in _rois)
+                {
+                    if (roi.Component == component) words.Add(roi.ToRroiString(pl.RoiMasks));
+                }
+            }
+
+            pl["Rroi"] = string.Join(" ", words);
+            pl["Rstart_level"] = StartLevel.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            pl["Ralign"] = BlockAligned ? "on" : "off";
+            pl["Rno_rect"] = ForceGenericMaskGeneration ? "on" : "off";
+        }
+    }
+    
+    /// <summary>
+    /// ROI scaling modes.
+    /// </summary>
+    internal enum ROIScalingMode
+    {
+        /// <summary>
+        /// MaxShift method - scales background coefficients down by shifting.
+        /// This is the standard JPEG 2000 Part 1 method.
+        /// </summary>
+        MaxShift
+    }
+    
+    /// <summary>
+    /// Base class for ROI descriptors.
+    /// </summary>
+    internal abstract class ROIDescriptor
+    {
+        /// <summary>
+        /// Gets the component index this ROI applies to (-1 for all components).
+        /// </summary>
+        public int Component { get; protected set; }
+        
+        /// <summary>
+        /// Gets the type of ROI shape.
+        /// </summary>
+        public abstract ROIShapeType ShapeType { get; }
+        
+        /// <summary>
+        /// Validates the ROI descriptor.
+        /// </summary>
+        /// <returns>List of validation error messages</returns>
+        public abstract List<string> Validate();
+
+        /// <summary>
+        /// Gets this ROI as it is written in the <c>Rroi</c> encoder option, without a component prefix.
+        /// </summary>
+        /// <param name="masks">The in-memory masks of the parameter list; a shape held in memory adds itself if it is not there yet.</param>
+        internal abstract string ToRroiString(List<ROIMask> masks);
+    }
+    
+    /// <summary>
+    /// ROI shape types.
+    /// </summary>
+    internal enum ROIShapeType
+    {
+        /// <summary>Rectangular ROI</summary>
+        Rectangle,
+        /// <summary>Circular ROI</summary>
+        Circle,
+        /// <summary>Arbitrary shape from mask file</summary>
+        Arbitrary,
+        /// <summary>Arbitrary shape from a mask held in memory</summary>
+        Mask
+    }
+    
+    /// <summary>
+    /// Describes a rectangular ROI.
+    /// </summary>
+    internal class RectangularROI : ROIDescriptor
+    {
+        /// <summary>
+        /// Gets the X coordinate of the upper-left corner.
+        /// </summary>
+        public int X { get; }
+        
+        /// <summary>
+        /// Gets the Y coordinate of the upper-left corner.
+        /// </summary>
+        public int Y { get; }
+        
+        /// <summary>
+        /// Gets the width of the rectangle.
+        /// </summary>
+        public int Width { get; }
+        
+        /// <summary>
+        /// Gets the height of the rectangle.
+        /// </summary>
+        public int Height { get; }
+        
+        /// <inheritdoc/>
+        public override ROIShapeType ShapeType => ROIShapeType.Rectangle;
+        
+        /// <summary>
+        /// Creates a new rectangular ROI descriptor.
+        /// </summary>
+        public RectangularROI(int component, int x, int y, int width, int height)
+        {
+            Component = component;
+            X = x;
+            Y = y;
+            Width = width;
+            Height = height;
+        }
+        
+        /// <inheritdoc/>
+        public override List<string> Validate()
+        {
+            var errors = new List<string>();
+            
+            if (Width <= 0)
+                errors.Add($"Rectangular ROI width must be positive (got {Width})");
+            if (Height <= 0)
+                errors.Add($"Rectangular ROI height must be positive (got {Height})");
+            if (X < 0)
+                errors.Add($"Rectangular ROI X coordinate must be non-negative (got {X})");
+            if (Y < 0)
+                errors.Add($"Rectangular ROI Y coordinate must be non-negative (got {Y})");
+                
+            return errors;
+        }
+        
+        internal override string ToRroiString(List<ROIMask> masks) => FormattableString.Invariant($"R {X} {Y} {Width} {Height}");
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return $"Rectangle ROI: Component={Component}, X={X}, Y={Y}, Width={Width}, Height={Height}";
+        }
+    }
+    
+    /// <summary>
+    /// Describes a circular ROI.
+    /// </summary>
+    internal class CircularROI : ROIDescriptor
+    {
+        /// <summary>
+        /// Gets the X coordinate of the circle center.
+        /// </summary>
+        public int CenterX { get; }
+        
+        /// <summary>
+        /// Gets the Y coordinate of the circle center.
+        /// </summary>
+        public int CenterY { get; }
+        
+        /// <summary>
+        /// Gets the radius of the circle.
+        /// </summary>
+        public int Radius { get; }
+        
+        /// <inheritdoc/>
+        public override ROIShapeType ShapeType => ROIShapeType.Circle;
+        
+        /// <summary>
+        /// Creates a new circular ROI descriptor.
+        /// </summary>
+        public CircularROI(int component, int centerX, int centerY, int radius)
+        {
+            Component = component;
+            CenterX = centerX;
+            CenterY = centerY;
+            Radius = radius;
+        }
+        
+        /// <inheritdoc/>
+        public override List<string> Validate()
+        {
+            var errors = new List<string>();
+            
+            if (Radius <= 0)
+                errors.Add($"Circular ROI radius must be positive (got {Radius})");
+            if (CenterX < 0)
+                errors.Add($"Circular ROI center X must be non-negative (got {CenterX})");
+            if (CenterY < 0)
+                errors.Add($"Circular ROI center Y must be non-negative (got {CenterY})");
+                
+            return errors;
+        }
+        
+        internal override string ToRroiString(List<ROIMask> masks) => FormattableString.Invariant($"C {CenterX} {CenterY} {Radius}");
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return $"Circular ROI: Component={Component}, Center=({CenterX},{CenterY}), Radius={Radius}";
+        }
+    }
+    
+    /// <summary>
+    /// Describes an arbitrary-shaped ROI from a mask file.
+    /// </summary>
+    internal class ArbitraryROI : ROIDescriptor
+    {
+        /// <summary>
+        /// Gets the path to the PGM mask file.
+        /// </summary>
+        public string MaskFilePath { get; }
+        
+        /// <inheritdoc/>
+        public override ROIShapeType ShapeType => ROIShapeType.Arbitrary;
+        
+        /// <summary>
+        /// Creates a new arbitrary ROI descriptor.
+        /// </summary>
+        public ArbitraryROI(int component, string maskFilePath)
+        {
+            Component = component;
+            MaskFilePath = maskFilePath;
+        }
+        
+        /// <inheritdoc/>
+        public override List<string> Validate()
+        {
+            var errors = new List<string>();
+            
+            if (string.IsNullOrWhiteSpace(MaskFilePath))
+                errors.Add("Arbitrary ROI mask file path cannot be empty");
+            else if (MaskFilePath.IndexOfAny(new[] { ' ', '\t', '\n', '\r', '\f' }) >= 0)
+                errors.Add($"Arbitrary ROI mask file path cannot contain whitespace: {MaskFilePath}");
+            else if (!System.IO.File.Exists(MaskFilePath))
+                errors.Add($"Arbitrary ROI mask file not found: {MaskFilePath}");
+                
+            return errors;
+        }
+        
+        internal override string ToRroiString(List<ROIMask> masks) => "A " + MaskFilePath;
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return $"Arbitrary ROI: Component={Component}, MaskFile={MaskFilePath}";
+        }
+    }
+
+    /// <summary>
+    /// Arbitrary-shaped ROI from a mask held in memory.
+    /// </summary>
+    internal class MaskROI : ROIDescriptor
+    {
+        /// <summary>
+        /// Gets the mask.
+        /// </summary>
+        public ROIMask Mask { get; }
+
+        /// <inheritdoc/>
+        public override ROIShapeType ShapeType => ROIShapeType.Mask;
+
+        /// <summary>
+        /// Creates a new in-memory mask ROI descriptor.
+        /// </summary>
+        public MaskROI(int component, ROIMask mask)
+        {
+            Component = component;
+            Mask = mask;
+        }
+
+        /// <inheritdoc/>
+        public override List<string> Validate()
+        {
+            var errors = new List<string>();
+
+            if (Mask == null)
+                errors.Add("ROI mask cannot be null");
+            else if (Mask.PixelCount == 0)
+                errors.Add("ROI mask must contain at least one pixel");
+
+            return errors;
+        }
+
+        internal override string ToRroiString(List<ROIMask> masks)
+        {
+            var index = masks.IndexOf(Mask);
+            if (index < 0)
+            {
+                index = masks.Count;
+                masks.Add(Mask);
+            }
+            return "M " + index.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return $"Mask ROI: Component={Component}, Mask={Mask?.Width}x{Mask?.Height}, Pixels={Mask?.PixelCount}";
+        }
+    }
+}

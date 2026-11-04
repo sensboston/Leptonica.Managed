@@ -1,0 +1,19 @@
+{
+  "error": false,
+  "width": 32,
+  "height": 32,
+  "bitDepth": 2,
+  "colorType": 3,
+  "channels": 1,
+  "rowBytes": 8,
+  "interlace": 0,
+  "palette": [[0, 0, 255], [0, 0, 255], [0, 0, 255], [0, 0, 255]],
+  "tRNS": true,
+  "trans": [0, 85, 170],
+  "transColor": [0, 0, 0, 0],
+  "pHYs": null,
+  "xPixelsPerMeter": 0,
+  "yPixelsPerMeter": 0,
+  "gamma": null,
+  "text": []
+}

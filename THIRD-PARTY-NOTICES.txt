@@ -1,0 +1,199 @@
+THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
+============================================
+
+Leptonica.Managed incorporates pure-managed source components from the following
+permissively licensed open-source projects under internal namespaces.
+
+-------------------------------------------------------------------------------
+1. BitMiracle LibJpeg.Net (integrated under src/Leptonica.Managed/Internal/Tiff/LibJpeg)
+-------------------------------------------------------------------------------
+
+Copyright (c) 2008-2018, Bit Miracle
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+- Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+- Redistributions in binary form must reproduce the above copyright notice, this
+  list of conditions and the following disclaimer in the documentation and/or
+  other materials provided with the distribution.
+- Neither the name of Bit Miracle nor the names of its contributors may be used
+  to endorse or promote products derived from this software without specific
+  prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL BIT MIRACLE BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+NOTE:
+This software is based in part on the work of the Independent JPEG Group
+(http://www.ijg.org/), Copyright (C) 1991-1998, Thomas G. Lane.
+
+-------------------------------------------------------------------------------
+2. BitMiracle LibTiff.Net (integrated under src/Leptonica.Managed/Internal/Tiff)
+-------------------------------------------------------------------------------
+
+Copyright (c) 2008-2019, Bit Miracle
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+- Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+- Redistributions in binary form must reproduce the above copyright notice, this
+  list of conditions and the following disclaimer in the documentation and/or
+  other materials provided with the distribution.
+- Neither the name of Bit Miracle nor the names of its contributors may be used
+  to endorse or promote products derived from this software without specific
+  prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL BIT MIRACLE BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+NOTE:
+This software is based in part on LibTIFF - TIFF Library and Utilities
+(http://www.remotesensing.org/libtiff/):
+Copyright (c) 1988-1997 Sam Leffler
+Copyright (c) 1991-1997 Silicon Graphics, Inc.
+
+-------------------------------------------------------------------------------
+3. CoreJ2K / CSJ2K / JJ2000 (integrated under src/Leptonica.Managed/Internal/Jp2k)
+-------------------------------------------------------------------------------
+
+Copyright (c) 2007-2016, CSJ2K contributors.
+Copyright (c) 2024-2026, Sjofn LLC.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+3. Neither the name of the copyright holder nor the names of its contributors
+   may be used to endorse or promote products derived from this software without
+   specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+JJ2000 COPYRIGHT:
+This software module was originally developed by Raphael Grosbois and Diego
+Santa Cruz (Swiss Federal Institute of Technology-EPFL); Joel Askelof (Ericsson
+Radio Systems AB); and Bertrand Berthelot, David Bouchard, Felix Henry, Gerard
+Mozelle and Patrice Onno (Canon Research Centre France S.A) in the course of
+development of the JPEG2000 standard as specified by ISO/IEC 15444 (JPEG 2000
+Standard). Swiss Federal Institute of Technology-EPFL, Ericsson Radio Systems AB
+and Canon Research Centre France S.A (collectively JJ2000 Partners) agree not to
+assert against ISO/IEC and users of the JPEG 2000 Standard (Users) any of their
+rights under the copyright, not including other intellectual property rights,
+for this software module with respect to the usage by ISO/IEC and Users of this
+software module or modifications thereof for use in hardware or software
+products claiming conformance to the JPEG 2000 Standard. Those intending to use
+this software module in hardware or software products are advised that their use
+may infringe existing patents. The original developers of this software module,
+JJ2000 Partners and ISO/IEC assume no liability for use of this software module
+or modifications thereof. No license or right to this software module is granted
+for non JPEG 2000 Standard conforming products. JJ2000 Partners have full right
+to use this software module for his/her own purpose, assign or donate this
+software module to any third party and to inhibit third parties from using this
+software module for non JPEG 2000 Standard conforming products. this copyright
+notice must be included in all copies or derivative works of this software
+module.
+Copyright (c) 1999/2000 JJ2000 Partners.
+
+================================================================================
+4. webpkit (adapted into C# in src/Leptonica.Managed/Internal/WebP)
+   https://github.com/P4suta/webpkit
+   License: MIT (also implements IETF RFC 6386 and RFC 9649)
+================================================================================
+
+MIT License
+
+Copyright (c) webpkit contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+================================================================================
+5. ILGPU & ILGPU.Algorithms 1.5.3 (NuGet package dependencies for optional GPU
+   acceleration via CUDA / OpenCL / CPU)
+   https://github.com/m4rs-mt/ILGPU
+   License: University of Illinois/NCSA Open Source License
+================================================================================
+
+University of Illinois/NCSA Open Source License
+Copyright (c) 2016-2025 ILGPU Project
+All rights reserved.
+
+Developed by:           Marcel Koester (m4rs@m4rs.net)
+                        www.ilgpu.net
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal with
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimers.
+
+    * Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimers in the documentation
+      and/or other materials provided with the distribution.
+
+    * Neither the names of ILGPU, Marcel Koester, nor the names of its
+      contributors may be used to endorse or promote products derived from this
+      Software without specific prior written permission.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE CONTRIBUTORS
+OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+
+

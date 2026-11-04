@@ -1,0 +1,19 @@
+{
+  "error": false,
+  "width": 32,
+  "height": 32,
+  "bitDepth": 4,
+  "colorType": 0,
+  "channels": 1,
+  "rowBytes": 16,
+  "interlace": 0,
+  "palette": [],
+  "tRNS": false,
+  "trans": [],
+  "transColor": [0, 0, 0, 0],
+  "pHYs": null,
+  "xPixelsPerMeter": 0,
+  "yPixelsPerMeter": 0,
+  "gamma": 1.00000,
+  "text": [["Title", "PngSuite"], ["Author", "Willem van Schaik (willem@schaik.com)"], ["Copyright", "Copyright Willem van Schaik, Kanada 2011"], ["Description", "kokoelma joukon kuvia luotu testata eri v\u00c3\u00a4ri-tyyppisi\u00c3\u00a4 PNG-muodossa. Mukana on mustavalkoinen, v\u00c3\u00a4ri, paletted, alpha-kanava, avoimuuden muodossa. Kaikki bit-syvyydess\u00c3\u00a4 mukaan sallittua spec on \u00e2\u0080\u008b\u00e2\u0080\u008bl\u00c3\u00a4sn\u00c3\u00a4."], ["Software", "Luotu NeXTstation v\u00c3\u00a4ri\u00c3\u00a4 \"pnmtopng\"."], ["Disclaimer", "Freeware."]]
+}

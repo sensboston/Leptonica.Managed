@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <RootNamespace>Leptonica</RootNamespace>
+    <AssemblyName>Leptonica.Managed</AssemblyName>
+    <DefineConstants>$(DefineConstants);NETSTANDARD;FIX_JPEG_IS_OJPEG</DefineConstants>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Leptonica.Managed</PackageId>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <VersionSuffix>preview</VersionSuffix>
+    <Description>A fully managed .NET port of Leptonica 1.87.0, the image processing and image analysis library by Dan Bloomberg. Bit-exact with the native library, no native dependencies; JPEG, PNG, TIFF, GIF, WebP, JPEG 2000, BMP, PNM codecs included.</Description>
+    <PackageTags>leptonica;image-processing;document-image;ocr;morphology;binarization;tiff;png;jpeg</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ILGPU" />
+    <PackageReference Include="ILGPU.Algorithms" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Leptonica.Managed.Tests" />
+    <InternalsVisibleTo Include="ILGPURuntime" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Morph\Templates\*.txt" LogicalName="Leptonica.Templates.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
+
+</Project>

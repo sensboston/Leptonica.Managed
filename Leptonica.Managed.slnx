@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Leptonica.Managed/Leptonica.Managed.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Leptonica.Managed.Tests/Leptonica.Managed.Tests.csproj" />
+  </Folder>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/Leptonica.Managed.Benchmarks/Leptonica.Managed.Benchmarks.csproj" />
+  </Folder>
+</Solution>

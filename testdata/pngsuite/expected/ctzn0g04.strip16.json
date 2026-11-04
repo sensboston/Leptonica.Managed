@@ -1,0 +1,19 @@
+{
+  "error": false,
+  "width": 32,
+  "height": 32,
+  "bitDepth": 4,
+  "colorType": 0,
+  "channels": 1,
+  "rowBytes": 16,
+  "interlace": 0,
+  "palette": [],
+  "tRNS": false,
+  "trans": [],
+  "transColor": [0, 0, 0, 0],
+  "pHYs": null,
+  "xPixelsPerMeter": 0,
+  "yPixelsPerMeter": 0,
+  "gamma": 1.00000,
+  "text": [["Title", "PngSuite"], ["Author", "Willem A.J. van Schaik\u000a(willem@schaik.com)"], ["Copyright", "Copyright Willem van Schaik, Singapore 1995-96"], ["Description", "A compilation of a set of images created to test the\u000avarious color-types of the PNG format. Included are\u000ablack&white, color, paletted, with alpha channel, with\u000atransparency formats. All bit-depths allowed according\u000ato the spec are present."], ["Software", "Created on a NeXTstation color using \"pnmtopng\"."], ["Disclaimer", "Freeware."]]
+}

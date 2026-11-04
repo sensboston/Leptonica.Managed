@@ -1,0 +1,48 @@
+#nullable disable
+#pragma warning disable CS0618, CS0649, CS0168, CS0169, CS0219, CS0414, SYSLIB0011, SYSLIB0014, CS8981
+/*
+ * Builtin Compression Scheme Configuration Support.
+ */
+
+using BitMiracle.LibTiff.Classic.Internal;
+
+namespace BitMiracle.LibTiff.Classic
+{
+#if EXPOSE_LIBTIFF
+    public
+#endif
+    partial class Tiff
+    {
+        /// <summary>
+        /// Compression schemes statically built into the library.
+        /// </summary>
+        private void setupBuiltInCodecs()
+        {
+            // change initial syntax of m_builtInCodecs, maintains easier.
+            // San Chen <bigsan.chen@gmail.com>
+
+            m_builtInCodecs = new TiffCodec[]
+            {
+                new TiffCodec(this, (Compression)(-1), "Not configured"),
+                new DumpModeCodec(this, Compression.NONE, "None"),
+                new LZWCodec(this, Compression.LZW, "LZW"),
+                new PackBitsCodec(this, Compression.PACKBITS, "PackBits"),
+                new TiffCodec(this, Compression.THUNDERSCAN, "ThunderScan"),
+                new TiffCodec(this, Compression.NEXT, "NeXT"),
+                new JpegCodec(this, Compression.JPEG, "JPEG"),
+                new OJpegCodec(this, Compression.OJPEG, "Old-style JPEG"),
+                new CCITTCodec(this, Compression.CCITTRLE, "CCITT RLE"),
+                new CCITTCodec(this, Compression.CCITTRLEW, "CCITT RLE/W"),
+                new CCITTCodec(this, Compression.CCITTFAX3, "CCITT Group 3"),
+                new CCITTCodec(this, Compression.CCITTFAX4, "CCITT Group 4"),
+                new TiffCodec(this, Compression.JBIG, "ISO JBIG"),
+                new DeflateCodec(this, Compression.DEFLATE, "Deflate"),
+                new DeflateCodec(this, Compression.ADOBE_DEFLATE, "AdobeDeflate"),
+                new TiffCodec(this, Compression.PIXARLOG, "PixarLog"),
+                new TiffCodec(this, Compression.SGILOG, "SGILog"),
+                new TiffCodec(this, Compression.SGILOG24, "SGILog24"),
+                null,
+            };
+        }
+    }
+}
