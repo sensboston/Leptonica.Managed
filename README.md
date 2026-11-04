@@ -109,11 +109,19 @@ LeptParallel.MaxDegreeOfParallelism = 1;   // single-threaded, like the C librar
 
 ## Performance
 
-The benchmark runs 68 fixed operations on the C library and on this package and reports the
-speedup `T(native) / T(managed)` (the geometric mean over all operations; above 1 means the
-managed code is faster). The native library is the regular Release build of Leptonica 1.87.0
-with its codecs from vcpkg (MSVC, x64). The benchmark programs are in [benchmarks](benchmarks);
-the results for several machines will be published here.
+![Speedup over the native library](docs/images/benchmark-overview.png)
+
+The benchmark runs 68 fixed operations on the C library and on this package, on the same
+machine and the same images, and reports the speedup `T(native) / T(managed)`: the geometric
+mean over all operations, above 1 means the managed code is faster. The native library is a
+regular Release build of Leptonica 1.87.0 (MSVC with the codecs from vcpkg on Windows, gcc with
+the system codecs on Linux), running on one thread as it does.
+
+These are synthetic numbers for single operations, not a promise for every workload: most
+operations are faster than in C, and some are slower, the JPEG codec and the TIFF G4 decoder in
+particular, and more of them on ARM64. Every operation on every machine is listed in
+[docs/benchmarks.md](docs/benchmarks.md), including the slower ones; the benchmark programs
+are in [benchmarks](benchmarks).
 
 ## Status
 
