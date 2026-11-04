@@ -109,16 +109,11 @@ LeptParallel.MaxDegreeOfParallelism = 1;   // single-threaded, like the C librar
 
 ## Performance
 
-<!-- Filled in from the final benchmark run. -->
-
-![Speedup over the native library](docs/images/benchmark-overview.png)
-
 The benchmark runs 68 fixed operations on the C library and on this package and reports the
 speedup `T(native) / T(managed)` (the geometric mean over all operations; above 1 means the
 managed code is faster). The native library is the regular Release build of Leptonica 1.87.0
-with its codecs from vcpkg (MSVC, x64). Per-operation results for every machine are in
-[docs/benchmarks.md](docs/benchmarks.md); the benchmark programs are in
-[benchmarks](benchmarks).
+with its codecs from vcpkg (MSVC, x64). The benchmark programs are in [benchmarks](benchmarks);
+the results for several machines will be published here.
 
 ## Status
 

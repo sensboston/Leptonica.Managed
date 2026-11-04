@@ -19,7 +19,8 @@ $build = Join-Path $work "build"
 if (-not $Vcpkg) { throw "VCPKG_ROOT is not set" }
 
 if (-not (Test-Path $src)) {
-    git clone --depth 1 --branch 1.87.0 https://github.com/DanBloomberg/leptonica.git $src
+    # Keep the original LF line endings: some regression tests process text files.
+    git -c core.autocrlf=false clone --depth 1 --branch 1.87.0 https://github.com/DanBloomberg/leptonica.git $src
     if ($LASTEXITCODE) { throw "git clone failed" }
 }
 

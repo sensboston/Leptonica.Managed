@@ -1,4 +1,6 @@
 * text=auto eol=lf
+# Test data is compared byte by byte: never convert line endings.
+testdata/** -text
 *.cs text eol=lf
 *.sln text eol=crlf
 *.slnx text eol=lf
