@@ -1,6 +1,6 @@
 # Leptonica.Managed
 
-A fully managed C# implementation of [Leptonica](http://www.leptonica.org) 1.87.0, the
+A fully managed C# implementation of [Leptonica](https://github.com/DanBloomberg/leptonica) 1.87.0, the
 image processing and image analysis library, for .NET 8 and later.
 
 ```
