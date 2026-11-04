@@ -1,0 +1,120 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: 1
+
+jobs:
+  # The golden files of the regression tests are made by the native Leptonica build
+  # (tools/native) and cached; they only change when the native scripts change.
+  goldens:
+    runs-on: windows-2022
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore goldens
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: testdata/golden
+          key: goldens-${{ hashFiles('tools/native/**') }}
+          enableCrossOsArchive: true
+
+      - name: Build native Leptonica
+        if: steps.cache.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: ./tools/native/build.ps1 -Vcpkg $env:VCPKG_INSTALLATION_ROOT
+
+      - name: Generate goldens
+        if: steps.cache.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: ./tools/native/goldens.ps1
+
+  test:
+    needs: goldens
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            gpu: auto
+          - os: ubuntu-latest
+            gpu: auto
+          # GPU kernels on the ILGPU CPU accelerator: the GPU code paths run and are
+          # compared with the goldens on a machine without a GPU.
+          - os: ubuntu-latest
+            gpu: force
+    name: test (${{ matrix.os }}, gpu ${{ matrix.gpu }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    env:
+      LEPT_GPU_MODE: ${{ matrix.gpu }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Restore goldens
+        uses: actions/cache/restore@v4
+        with:
+          path: testdata/golden
+          key: goldens-${{ hashFiles('tools/native/**') }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: true
+
+      - name: Build
+        run: dotnet build -c Release
+
+      - name: Test
+        run: dotnet test -c Release --no-build --logger "trx;LogFilePrefix=results" --results-directory TestResults
+
+      - name: Test summary
+        if: always()
+        shell: bash
+        run: |
+          [ -d TestResults ] || exit 0
+          python3 - TestResults >> "$GITHUB_STEP_SUMMARY" <<'EOF'
+          import glob, os, sys, xml.etree.ElementTree as ET
+          ns = {'t': 'http://microsoft.com/schemas/VisualStudio/TeamTest/2010'}
+          total = passed = failed = 0
+          failures = []
+          for path in sorted(glob.glob(os.path.join(sys.argv[1], '*.trx'))):
+              results = ET.parse(path).getroot().findall('.//t:UnitTestResult', ns)
+              total += len(results)
+              for u in results:
+                  if u.get('outcome') == 'Passed':
+                      passed += 1
+                  elif u.get('outcome') == 'Failed':
+                      failed += 1
+                      m = u.find('.//t:ErrorInfo/t:Message', ns)
+                      msg = (m.text or '').strip().splitlines()[:12] if m is not None else []
+                      failures.append((u.get('testName'), msg))
+          print(f"### Tests: {passed} passed, {failed} failed, {total - passed - failed} skipped\n")
+          for name, msg in failures:
+              print(f"- **{name}**\n  ```text\n  " + "\n  ".join(msg) + "\n  ```")
+          EOF
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}-${{ matrix.gpu }}
+          path: TestResults/**/*.trx
+          if-no-files-found: ignore
+          retention-days: 7
