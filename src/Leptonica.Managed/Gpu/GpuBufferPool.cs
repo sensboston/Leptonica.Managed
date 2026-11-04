@@ -10,7 +10,7 @@ namespace Leptonica.Gpu;
 /// Rentable 1D dense GPU buffer wrapper that returns its underlying <see cref="MemoryBuffer1D{T, TStride}"/>
 /// to <see cref="GpuBufferPool"/> upon disposal.
 /// </summary>
-public sealed class PooledGpuBuffer<T> : IDisposable
+internal sealed class PooledGpuBuffer<T> : IDisposable
     where T : unmanaged
 {
     private readonly GpuBufferPool _pool;

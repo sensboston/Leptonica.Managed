@@ -6,7 +6,7 @@ namespace Leptonica;
 /// Replacement for the C runtime rand() / srand(). Reproduces the MSVC CRT generator,
 /// so sequences match the goldens. One generator per thread, as in the CRT.
 /// </summary>
-public static class CRand
+internal static class CRand
 {
     /* MSVC: rand() without a prior srand() behaves as srand(1) */
     [ThreadStatic] private static uint state;

@@ -8,7 +8,7 @@ namespace Leptonica;
 /// <summary>
 /// Execution backend family reported by an <see cref="IGpuAccelerator"/> implementation.
 /// </summary>
-public enum GpuBackendKind
+internal enum GpuBackendKind
 {
     /// <summary>No accelerator active.</summary>
     None = 0,
@@ -21,16 +21,15 @@ public enum GpuBackendKind
 }
 
 /// <summary>
-/// Library-wide GPU execution policy controlled via <see cref="LeptGpu.Mode"/>,
-/// <see cref="LeptGpu.Configure"/>, or <see cref="Utils.SetGpuMode"/>.
+/// Library-wide GPU execution policy, set with <see cref="LeptGpu.Mode"/>.
 /// </summary>
 public enum GpuMode
 {
     /// <summary>
-    /// Default policy: lazily probes for a hardware GPU (NVIDIA CUDA or AMD/Intel/Apple OpenCL)
-    /// the first time an operation exceeds the PCIe break-even thresholds (<see cref="LeptGpu.MinPixels"/>
-    /// and <see cref="LeptGpu.MinTotalWork"/>). Uses the GPU when profitable; otherwise executes
-    /// purely on CPU with near-zero overhead.
+    /// Default policy: probes for a hardware GPU (NVIDIA CUDA or AMD/Intel/Apple OpenCL) the
+    /// first time an operation is large enough for the GPU to pay off, and uses it for such
+    /// operations; everything else, and everything on a machine without a GPU, runs on the CPU.
+    /// The results are the same either way.
     /// </summary>
     Auto = 0,
 
@@ -52,7 +51,7 @@ public enum GpuMode
 /// compute-bound raster operations while preserving automatic fallback to the SIMD/parallel
 /// CPU implementation in <c>Leptonica.Managed</c>.
 /// </summary>
-public interface IGpuAccelerator : IDisposable
+internal interface IGpuAccelerator : IDisposable
 {
     /// <summary>Human-readable accelerator device name.</summary>
     string DeviceName { get; }
@@ -351,7 +350,7 @@ public static class LeptGpu
     /// Preferred hardware backend when auto-initializing ILGPU (<see cref="GpuBackendPreference.Auto"/>
     /// tries NVIDIA CUDA first, then OpenCL).
     /// </summary>
-    public static GpuBackendPreference BackendPreference
+    internal static GpuBackendPreference BackendPreference
     {
         get => s_backendPreference;
         set {
@@ -367,7 +366,7 @@ public static class LeptGpu
     /// <summary>
     /// Configures GPU execution policy and cost-model thresholds in a single call at startup.
     /// </summary>
-    public static void Configure(
+    internal static void Configure(
         GpuMode mode = GpuMode.Auto,
         GpuBackendPreference backend = GpuBackendPreference.Auto,
         long minPixels = 16_384,
@@ -390,13 +389,13 @@ public static class LeptGpu
     /// Convenience helper equivalent to <c>LeptGpu.Mode = GpuMode.CpuOnly</c>: disables GPU usage
     /// so all operations run strictly on CPU like native C Leptonica.
     /// </summary>
-    public static void Disable() => Mode = GpuMode.CpuOnly;
+    internal static void Disable() => Mode = GpuMode.CpuOnly;
 
     /// <summary>
     /// Convenience helper equivalent to <c>LeptGpu.Mode = GpuMode.Auto</c>: enables automatic
     /// hardware GPU acceleration when available and faster than CPU.
     /// </summary>
-    public static void EnableAuto() => Mode = GpuMode.Auto;
+    internal static void EnableAuto() => Mode = GpuMode.Auto;
 
     /// <summary>
     /// Disposes any lazily initialized built-in GPU contexts/buffers and resets auto-discovery state.
@@ -412,7 +411,7 @@ public static class LeptGpu
     /// Creates an <see cref="AsyncLocal{T}"/>-isolated GPU execution scope for the current async/thread flow.
     /// Ideal for deterministic testing without affecting concurrent threads.
     /// </summary>
-    public static IDisposable BeginScope(IGpuAccelerator? accelerator, GpuMode mode = GpuMode.ForceGpu)
+    internal static IDisposable BeginScope(IGpuAccelerator? accelerator, GpuMode mode = GpuMode.ForceGpu)
     {
         ScopedGpuState? prev = s_scopedState.Value;
         Interlocked.Increment(ref s_activeScopes);
@@ -455,7 +454,7 @@ public static class LeptGpu
     /// Backend kind of the currently active GPU accelerator (<see cref="GpuBackendKind.Cuda"/>,
     /// <see cref="GpuBackendKind.OpenCL"/>, <see cref="GpuBackendKind.Cpu"/>, or <see cref="GpuBackendKind.None"/>).
     /// </summary>
-    public static GpuBackendKind ActiveBackendKind
+    internal static GpuBackendKind ActiveBackendKind
     {
         get {
             if (Mode == GpuMode.CpuOnly)
@@ -473,12 +472,12 @@ public static class LeptGpu
     /// Total number of operations successfully executed on an active <see cref="IGpuAccelerator"/>
     /// since process start or the last call to <see cref="ResetDispatchCount"/>.
     /// </summary>
-    public static long DispatchCount => Interlocked.Read(ref s_dispatchCount);
+    internal static long DispatchCount => Interlocked.Read(ref s_dispatchCount);
 
     /// <summary>
     /// Resets <see cref="DispatchCount"/> to zero.
     /// </summary>
-    public static void ResetDispatchCount() => Interlocked.Exchange(ref s_dispatchCount, 0);
+    internal static void ResetDispatchCount() => Interlocked.Exchange(ref s_dispatchCount, 0);
 
     internal static void RecordDispatch() => Interlocked.Increment(ref s_dispatchCount);
 
@@ -509,7 +508,7 @@ public static class LeptGpu
     /// <summary>
     /// Explicit custom GPU accelerator override, or <c>null</c> to use built-in <see cref="Mode"/> auto-management.
     /// </summary>
-    public static IGpuAccelerator? Accelerator
+    internal static IGpuAccelerator? Accelerator
     {
         get => EffectiveCustomAccelerator ?? s_autoHwAccelerator;
         set => s_customAccelerator = value;
@@ -518,7 +517,7 @@ public static class LeptGpu
     /// <summary>
     /// Master switch mapping to <see cref="Mode"/> (<c>true</c> when not <see cref="GpuMode.CpuOnly"/>).
     /// </summary>
-    public static bool Enabled
+    internal static bool Enabled
     {
         get => Mode != GpuMode.CpuOnly;
         set => s_mode = value ? (s_mode == GpuMode.ForceGpu ? GpuMode.ForceGpu : GpuMode.Auto) : GpuMode.CpuOnly;
@@ -528,7 +527,7 @@ public static class LeptGpu
     /// Maps to <see cref="GpuMode.ForceGpu"/>: when <c>true</c>, bypasses PCIe size thresholds and allows
     /// offloading to CPU-emulated <see cref="IGpuAccelerator"/> backends.
     /// </summary>
-    public static bool ForceOffload
+    internal static bool ForceOffload
     {
         get => Mode == GpuMode.ForceGpu;
         set => s_mode = value ? GpuMode.ForceGpu : (s_mode == GpuMode.CpuOnly ? GpuMode.CpuOnly : GpuMode.Auto);
@@ -537,7 +536,7 @@ public static class LeptGpu
     /// <summary>
     /// Minimum pixel count required before transparent single-op GPU offload is considered in <see cref="GpuMode.Auto"/>.
     /// </summary>
-    public static long MinPixels
+    internal static long MinPixels
     {
         get => Interlocked.Read(ref s_minPixels);
         set => Interlocked.Exchange(ref s_minPixels, Math.Max(1, value));
@@ -546,7 +545,7 @@ public static class LeptGpu
     /// <summary>
     /// Minimum estimated work (<c>pixelCount * opsPerPixel</c>) required to amortize host↔device transfer in <see cref="GpuMode.Auto"/>.
     /// </summary>
-    public static long MinTotalWork
+    internal static long MinTotalWork
     {
         get => Interlocked.Read(ref s_minTotalWork);
         set => Interlocked.Exchange(ref s_minTotalWork, Math.Max(1, value));
@@ -556,14 +555,14 @@ public static class LeptGpu
     /// Evaluates whether an operation with <paramref name="pixelCount"/> pixels and
     /// <paramref name="opsPerPixel"/> arithmetic operations per pixel will be dispatched to the GPU.
     /// </summary>
-    public static bool ShouldOffload(long pixelCount, int opsPerPixel)
+    internal static bool ShouldOffload(long pixelCount, int opsPerPixel)
         => TryGetActive(pixelCount, opsPerPixel, out _);
 
     /// <summary>
     /// Fast path used by Tier-1 <see cref="Pix"/> methods to obtain an active accelerator when
     /// <see cref="Mode"/> and the PCIe cost model approve GPU offload.
     /// </summary>
-    public static bool TryGetActive(long pixelCount, int opsPerPixel, [NotNullWhen(true)] out IGpuAccelerator? accelerator)
+    internal static bool TryGetActive(long pixelCount, int opsPerPixel, [NotNullWhen(true)] out IGpuAccelerator? accelerator)
     {
         if (pixelCount <= 0) {
             accelerator = null;
@@ -699,7 +698,7 @@ public static partial class Utils
     /// or <see cref="GpuMode.CpuOnly"/> to force pure CPU execution like native C Leptonica)
     /// and returns the previous <see cref="GpuMode"/>.
     /// </summary>
-    public static GpuMode SetGpuMode(GpuMode mode)
+    internal static GpuMode SetGpuMode(GpuMode mode)
     {
         GpuMode prev = LeptGpu.Mode;
         LeptGpu.Mode = mode;
@@ -709,5 +708,5 @@ public static partial class Utils
     /// <summary>
     /// Returns the current library-wide <see cref="GpuMode"/> (<see cref="GpuMode.Auto"/> by default).
     /// </summary>
-    public static GpuMode GetGpuMode() => LeptGpu.Mode;
+    internal static GpuMode GetGpuMode() => LeptGpu.Mode;
 }

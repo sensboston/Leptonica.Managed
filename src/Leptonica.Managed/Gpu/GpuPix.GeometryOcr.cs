@@ -3,7 +3,7 @@ using Leptonica.Gpu.Kernels;
 
 namespace Leptonica.Gpu;
 
-public sealed partial class GpuPix
+internal sealed partial class GpuPix
 {
     /// <summary>Executes backward-mapped affine warp in VRAM.</summary>
     public GpuPix Affine(float[] vc, int incolor = L.L_BRING_IN_WHITE, bool sampled = false) =>

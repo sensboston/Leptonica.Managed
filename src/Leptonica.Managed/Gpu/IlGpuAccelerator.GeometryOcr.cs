@@ -6,7 +6,7 @@ using Leptonica.Gpu.Kernels;
 
 namespace Leptonica.Gpu;
 
-public sealed partial class IlGpuAccelerator
+internal sealed partial class IlGpuAccelerator
 {
     private Action<Index1D, ArrayView1D<uint, Stride1D.Dense>, ArrayView1D<uint, Stride1D.Dense>, GeometryOcrKernels.WarpParams>? _warpBinaryKernel;
     private Action<Index1D, ArrayView1D<uint, Stride1D.Dense>, ArrayView1D<uint, Stride1D.Dense>, GeometryOcrKernels.WarpParams>? _warpGrayKernel;

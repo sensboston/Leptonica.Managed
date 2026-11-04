@@ -28,6 +28,8 @@
   <ItemGroup>
     <InternalsVisibleTo Include="Leptonica.Managed.Tests" />
     <InternalsVisibleTo Include="ILGPURuntime" />
+    <InternalsVisibleTo Include="bench_managed" />
+    <InternalsVisibleTo Include="bench_managed" />
   </ItemGroup>
 
   <ItemGroup>

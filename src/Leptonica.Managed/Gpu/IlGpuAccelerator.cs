@@ -13,7 +13,7 @@ namespace Leptonica.Gpu;
 /// <summary>
 /// Preferred backend selection policy when creating an <see cref="IlGpuAccelerator"/>.
 /// </summary>
-public enum GpuBackendPreference
+internal enum GpuBackendPreference
 {
     /// <summary>Prefer NVIDIA CUDA, then OpenCL (AMD / Intel / Apple), then ILGPU CPU fallback.</summary>
     Auto = 0,
@@ -30,7 +30,7 @@ public enum GpuBackendPreference
 /// (supporting NVIDIA CUDA, AMD/Intel OpenCL, and CPU fallback) with pooled VRAM buffers and
 /// VRAM-resident <see cref="GpuPix"/> pipeline support.
 /// </summary>
-public sealed partial class IlGpuAccelerator : IGpuAccelerator
+internal sealed partial class IlGpuAccelerator : IGpuAccelerator
 {
     private readonly Context _context;
     private readonly Accelerator _accelerator;

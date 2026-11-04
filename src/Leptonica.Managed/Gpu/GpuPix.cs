@@ -9,7 +9,7 @@ namespace Leptonica.Gpu;
 /// enabling multi-stage image-processing pipelines (<c>Upload once → Chain kernels in VRAM → Download once</c>)
 /// without intermediate PCIe host↔device round-trips.
 /// </summary>
-public sealed partial class GpuPix : IDisposable
+internal sealed partial class GpuPix : IDisposable
 {
     private PooledGpuBuffer<uint>? _buffer;
 

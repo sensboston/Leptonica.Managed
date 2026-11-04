@@ -14,7 +14,7 @@ public sealed class GpuSequentialCollection { }
 /// </summary>
 public sealed class GpuTestFixture : IDisposable
 {
-    public IlGpuAccelerator Accel { get; }
+    internal IlGpuAccelerator Accel { get; }
 
     public GpuTestFixture()
     {

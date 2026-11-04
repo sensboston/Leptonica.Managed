@@ -85,7 +85,7 @@ public static class LeptParallel
     /// Minimum estimated work units (<c>rows * opsPerRow</c>) required before partitioning across threads.
     /// Prevents thread-pool scheduling overhead on small images or lightweight operations.
     /// </summary>
-    public static long MinWorkThreshold { get; set; } = 1_500_000L;
+    internal static long MinWorkThreshold { get; set; } = 1_500_000L;
 
     internal static int EffectiveDop
     {
