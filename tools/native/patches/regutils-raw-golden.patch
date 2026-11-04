@@ -1,0 +1,20 @@
+diff --git a/src/regutils.c b/src/regutils.c
+index 616b02b1..279b2bed 100644
+--- a/src/regutils.c
++++ b/src/regutils.c
+@@ -714,6 +714,15 @@ char  namebuf[256];
+         pixSetPadBits(pix, 0);
+     pixWrite(namebuf, pix, format);
+ 
++        /* For non-png formats, also save the exact pixels losslessly
++         * next to the golden file, for pixel-level comparison */
++    if (rp->mode == L_REG_GENERATE && format != IFF_PNG) {
++        char  rawbuf[256];
++        snprintf(rawbuf, sizeof(rawbuf), "/tmp/lept/golden/%s_golden.%02d.raw.png",
++                 rp->testname, rp->index + 1);
++        pixWrite(rawbuf, pix, IFF_PNG);
++    }
++
+         /* Either write the golden file ("generate") or check the
+            local file against an existing golden file ("compare") */
+     regTestCheckFile(rp, namebuf);
