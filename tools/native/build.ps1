@@ -5,7 +5,7 @@
 # Source:  artifacts/native/leptonica   (cloned at tag 1.87.0 if missing)
 # Output:  artifacts/native/build/bin/Release/*.dll, *_reg.exe
 #
-# Requires Visual Studio 2022 (C++ workload), CMake and vcpkg (VCPKG_ROOT).
+# Requires Visual Studio (C++ workload), CMake and vcpkg (VCPKG_ROOT).
 param(
     [string]$Vcpkg = $env:VCPKG_ROOT,
     [string]$Triplet = "x64-windows"
@@ -33,7 +33,7 @@ foreach ($p in $patches) {
     if ($LASTEXITCODE) { throw "patch failed: $p" }
 }
 try {
-    cmake -S $src -B $build -G "Visual Studio 17 2022" -A x64 `
+    cmake -S $src -B $build -A x64 `
         "-DCMAKE_TOOLCHAIN_FILE=$Vcpkg\scripts\buildsystems\vcpkg.cmake" `
         "-DVCPKG_TARGET_TRIPLET=$Triplet" `
         -DSW_BUILD=OFF -DBUILD_PROG=ON -DBUILD_SHARED_LIBS=ON
