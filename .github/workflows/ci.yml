@@ -52,6 +52,8 @@ jobs:
             gpu: auto
           - os: ubuntu-latest
             gpu: auto
+          - os: ubuntu-24.04-arm
+            gpu: auto
           # GPU kernels on the ILGPU CPU accelerator: the GPU code paths run and are
           # compared with the goldens on a machine without a GPU.
           - os: ubuntu-latest
@@ -118,3 +120,28 @@ jobs:
           path: TestResults/**/*.trx
           if-no-files-found: ignore
           retention-days: 7
+
+  # The NuGet package, built from the checkout (SourceLink, deterministic build).
+  # Publishing to nuget.org is done by hand from this artifact.
+  pack:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Pack
+        run: dotnet pack src/Leptonica.Managed -c Release -o artifacts/package
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: package
+          path: artifacts/package/*
+          retention-days: 30
