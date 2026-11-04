@@ -14,6 +14,7 @@
     <Description>A fully managed C# implementation of Leptonica 1.87.0, the image processing and image analysis library by Dan Bloomberg. No P/Invoke and no native binaries: the results match the C library, and the PNG, JPEG, TIFF, GIF, WebP, JPEG 2000, BMP and PNM codecs are included. SIMD, multithreading and optional GPU acceleration.</Description>
     <PackageTags>leptonica;image-processing;image-analysis;document-image;ocr;morphology;binarization;deskew;tiff;png;jpeg</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
     <EnablePackageValidation>true</EnablePackageValidation>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -36,6 +37,7 @@
 
   <ItemGroup>
     <None Include="PACKAGE.md" Pack="true" PackagePath="\README.md" />
+    <None Include="icon.png" Pack="true" PackagePath="\" />
     <None Include="..\..\LICENSE" Pack="true" PackagePath="\" Visible="false" />
     <None Include="..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
   </ItemGroup>
