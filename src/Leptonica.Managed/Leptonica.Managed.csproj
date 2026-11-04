@@ -15,6 +15,7 @@
     <PackageTags>leptonica;image-processing;image-analysis;document-image;ocr;morphology;binarization;deskew;tiff;png;jpeg</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
+    <PackageReleaseNotes>https://github.com/sensboston/Leptonica.Managed/blob/main/CHANGELOG.md</PackageReleaseNotes>
     <EnablePackageValidation>true</EnablePackageValidation>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
