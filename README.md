@@ -1,7 +1,14 @@
 # Leptonica.Managed
 
+[![NuGet](https://img.shields.io/nuget/v/Leptonica.Managed)](https://www.nuget.org/packages/Leptonica.Managed)
+[![CI](https://github.com/sensboston/Leptonica.Managed/actions/workflows/ci.yml/badge.svg)](https://github.com/sensboston/Leptonica.Managed/actions/workflows/ci.yml)
+[![.NET](https://img.shields.io/badge/.NET-8%20%7C%2010-512BD4)](https://dotnet.microsoft.com)
+[![Platforms](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)](#status)
+[![License](https://img.shields.io/badge/license-BSD--2--Clause-blue)](LICENSE)
+
 A fully managed C# implementation of [Leptonica](https://github.com/DanBloomberg/leptonica) 1.87.0, the
-image processing and image analysis library, for .NET 8 and later.
+image processing and image analysis library, for .NET 8 and later. Try it interactively with
+[Explorer](samples/Explorer), a desktop application for Windows, Linux and macOS.
 
 ```
 dotnet add package Leptonica.Managed
@@ -35,11 +42,11 @@ burden.
 - **The same results.** The port follows the C code function by function and keeps its integer
   and floating-point arithmetic. Leptonica's own regression tests, ported to C#, compare the
   results with golden files produced by the C library; images are compared pixel by pixel.
-- **Made for .NET.** Hot paths use SIMD (`Vector128`/`Vector256`, so they are also fast on ARM64)
-  and multithreading where the work splits into independent bands. Some operations can run on
-  a GPU through [ILGPU](https://github.com/m4rs-mt/ILGPU) (CUDA or OpenCL). In synthetic
-  benchmarks a part of the operations is faster than the native library, and a part is slower;
-  see [Performance](#performance).
+- **Made for .NET.** Hot paths use **SIMD** (`Vector128`/`Vector256`, on x64 and ARM64)
+  and **multithreading** where the work splits into independent bands. Some operations can run on
+  a **GPU** through [ILGPU](https://github.com/m4rs-mt/ILGPU) (CUDA or OpenCL). In synthetic
+  benchmarks most operations are faster than the native library and some are slower; see
+  [Performance](#performance).
 - **.NET conventions.** Errors are exceptions, outputs are return values or `out` parameters,
   memory is managed by the garbage collector, and every public member has XML documentation.
 
@@ -136,7 +143,8 @@ are in [benchmarks](benchmarks).
 
 - More than 97% of the public C functions (about 2,700) are ported. What is left are mostly
   functions that have no use in .NET, such as displaying images with external viewers.
-- Tested on Windows x64 and on Linux x64 and ARM64, with .NET 8 and .NET 10.
+- Tested on Windows x64 and on Linux x64 and ARM64, with .NET 8 and .NET 10; the samples also run
+  on macOS.
 - The regression tests of the C library are ported and run in CI against the golden files of
   the C library.
 
