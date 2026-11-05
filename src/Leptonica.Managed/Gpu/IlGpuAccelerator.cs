@@ -83,6 +83,9 @@ internal sealed partial class IlGpuAccelerator : IGpuAccelerator
             builder.Default();
             builder.Math(MathMode.Default);
             builder.Optimize(OptimizationLevel.O1);
+            // Kernels are compiled without debug symbols: loading the PDB files of the source
+            // assemblies costs time and is only useful to debug the kernels themselves.
+            builder.DebugSymbols(DebugSymbolsMode.Disabled);
         });
 
         try {
@@ -148,6 +151,7 @@ internal sealed partial class IlGpuAccelerator : IGpuAccelerator
                 builder.Default();
                 builder.Math(MathMode.Default);
                 builder.Optimize(OptimizationLevel.O1);
+                builder.DebugSymbols(DebugSymbolsMode.Disabled);
             });
 
             Accelerator? acc = null;

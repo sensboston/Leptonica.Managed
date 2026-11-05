@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- GPU kernels are compiled without loading debug symbols: no more first-chance
+  `BadImageFormatException` messages in the debugger output when the GPU is used.
+
 ## 1.0.0
 
 First release: a fully managed C# implementation of Leptonica 1.87.0 for .NET 8 and .NET 10.
