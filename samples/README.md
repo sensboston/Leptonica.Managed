@@ -14,7 +14,7 @@ of each step.
 
 | Sample | What it shows |
 |---|---|
-| [Explorer](Explorer) | Desktop application (Windows, Linux, macOS): seventeen operations with their parameters, the original and the result side by side, the time of each run, GPU on and off. |
+| [Explorer](Explorer) | Desktop application (Windows, Linux, macOS): seventeen operations with their parameters, the original and the result side by side with synchronized zoom and pan, the time of each run, a CPU and GPU comparison, drag and drop of image files. |
 | [OcrPipeline](OcrPipeline) | Preparing a scanned page for OCR: gray, background normalization, deskew, threshold, noise removal. |
 | [WebApi](WebApi) | An ASP.NET Core service with the pipeline behind a service in the dependency injection container: settings from `appsettings.json`, GPU start-up at server start, limited concurrency, problem details for bad input. `WebApi.http` has ready requests. |
 | [PageLayout](PageLayout) | Page segmentation of a newspaper page: pictures, text blocks and text lines, drawn over the page. |
@@ -24,7 +24,9 @@ of each step.
 
 ![Explorer: page segmentation](../docs/images/explorer-page-segmentation.png)
 
-![Explorer: gray morphology](../docs/images/explorer-gray-morphology.png)
+![Explorer: zoom into the page segmentation](../docs/images/explorer-zoom.png)
+
+![Explorer: gray morphology, CPU and GPU compared](../docs/images/explorer-gray-morphology.png)
 
 ## Notes
 

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
@@ -24,16 +25,19 @@ public partial class MainWindow : Window
     private Pix? _result;
     private int _version;
     private bool _loadingDemo;
+    private bool _comparing;
+    private readonly ZoomPan _zoom = new();
 
     // The named controls of MainWindow.axaml. They are looked up by name instead of using the
     // generated fields, so that the sample builds with every .NET SDK from 8 on.
     private readonly TreeView Operations;
     private readonly ComboBox Images;
-    private readonly Button OpenButton, SaveButton;
+    private readonly Button OpenButton, SaveButton, CompareButton;
     private readonly CheckBox UseGpu;
-    private readonly TextBlock Status, TitleText, Description, NoteText, ImageInfo, Busy;
+    private readonly TextBlock Status, TitleText, Description, NoteText, CompareText, ImageInfo, Busy;
     private readonly StackPanel Parameters;
     private readonly Image Original, Result;
+    private readonly Panel OriginalView, ResultView;
 
     public MainWindow()
     {
@@ -53,6 +57,17 @@ public partial class MainWindow : Window
         Parameters = Get<StackPanel>("Parameters");
         Original = Get<Image>("Original");
         Result = Get<Image>("Result");
+        CompareButton = Get<Button>("CompareButton");
+        CompareText = Get<TextBlock>("CompareText");
+        OriginalView = Get<Panel>("OriginalView");
+        ResultView = Get<Panel>("ResultView");
+
+        // Zoom and pan the two images together.
+        _zoom.Add(Original, OriginalView);
+        _zoom.Add(Result, ResultView);
+
+        // Drop an image file anywhere on the window to open it.
+        AddHandler(DragDrop.DropEvent, OnDrop);
 
         foreach (var group in Demos.All.GroupBy(d => d.Category))
         {
@@ -77,6 +92,8 @@ public partial class MainWindow : Window
 
         OpenButton.Click += OpenImage;
         SaveButton.Click += SaveResult;
+        CompareButton.Click += CompareCpuGpu;
+        CompareButton.IsEnabled = false;
         UseGpu.IsCheckedChanged += (_, _) =>
         {
             LeptGpu.Mode = UseGpu.IsChecked == true ? GpuMode.Auto : GpuMode.CpuOnly;
@@ -94,7 +111,13 @@ public partial class MainWindow : Window
 
         // Start the GPU in the background; operations started before it is ready run on the CPU.
         Status.Text = "Starting the GPU...";
-        Task.Run(() => LeptGpu.Warmup()).ContinueWith(_ => Dispatcher.UIThread.Post(Recompute));
+        Task.Run(() => LeptGpu.Warmup()).ContinueWith(t => Dispatcher.UIThread.Post(() =>
+        {
+            CompareButton.IsEnabled = t.Result;
+            if (!t.Result)
+                CompareText.Text = "There is no GPU on this machine: everything runs on the CPU.";
+            Recompute();
+        }));
 
         if (Operations.Items[0] is TreeViewItem first && first.Items[0] is TreeViewItem item)
             Operations.SelectedItem = item;
@@ -109,6 +132,7 @@ public partial class MainWindow : Window
         TitleText.Text = demo.Name;
         Description.Text = demo.Description;
         NoteText.Text = "";
+        CompareText.Text = CompareButton.IsEnabled ? "" : CompareText.Text;
         _values.Clear();
         Parameters.Children.Clear();
         foreach (Param p in demo.Params)
@@ -166,6 +190,8 @@ public partial class MainWindow : Window
         {
             if (!_images.TryGetValue(path, out Pix? pix))
                 _images[path] = pix = Pix.Read(path);
+            if (path != _imagePath)
+                _zoom.Reset();
             _imagePath = path;
             Original.Source = PixBitmap.ToBitmap(pix);
             ImageInfo.Text = $"{pix.Width} x {pix.Height}, {pix.Depth} bpp";
@@ -180,7 +206,7 @@ public partial class MainWindow : Window
     /// <summary>Runs the selected operation on a worker thread; only the newest run is shown.</summary>
     private async void Recompute()
     {
-        if (_demo == null || _imagePath == null)
+        if (_demo == null || _imagePath == null || _comparing)
             return;
         Demo demo = _demo;
         Pix input = _images[_imagePath];
@@ -256,5 +282,68 @@ public partial class MainWindow : Window
         string? path = file?.TryGetLocalPath();
         if (path != null)
             Pix.Write(path, _result, L.IFF_PNG);
+    }
+
+    /// <summary>
+    /// Runs the operation with the same parameters on the CPU and on the GPU and shows both times.
+    /// Each mode runs once before it is measured (the first GPU run of an operation includes the
+    /// compilation of its kernel), then the median of five runs is taken.
+    /// </summary>
+    private async void CompareCpuGpu(object? sender, RoutedEventArgs e)
+    {
+        if (_demo == null || _imagePath == null)
+            return;
+        Demo demo = _demo;
+        Pix input = _images[_imagePath];
+        var values = new Values(new Dictionary<string, double>(_values));
+        _comparing = true;
+        CompareButton.IsEnabled = false;
+        UseGpu.IsEnabled = false;
+        CompareText.Text = "measuring...";
+        try
+        {
+            var (cpu, gpu) = await Task.Run(() => (Measure(GpuMode.CpuOnly), Measure(GpuMode.Auto)));
+            double ratio = cpu / gpu;
+            CompareText.Text = $"CPU {cpu:F1} ms, GPU {gpu:F1} ms: " + (ratio >= 1.15
+                ? $"{ratio:F1} times faster on the GPU."
+                : "about the same; this operation runs on the CPU or is too small for the GPU.");
+        }
+        catch (Exception ex)
+        {
+            CompareText.Text = ex.Message;
+        }
+        finally
+        {
+            LeptGpu.Mode = UseGpu.IsChecked == true ? GpuMode.Auto : GpuMode.CpuOnly;
+            _comparing = false;
+            CompareButton.IsEnabled = true;
+            UseGpu.IsEnabled = true;
+        }
+
+        double Measure(GpuMode mode)
+        {
+            LeptGpu.Mode = mode;
+            demo.Run(input, values);
+            var times = new double[5];
+            for (int i = 0; i < times.Length; i++)
+            {
+                var sw = Stopwatch.StartNew();
+                demo.Run(input, values);
+                times[i] = sw.Elapsed.TotalMilliseconds;
+            }
+            Array.Sort(times);
+            return times[times.Length / 2];
+        }
+    }
+
+    private void OnDrop(object? sender, DragEventArgs e)
+    {
+        string? path = e.DataTransfer.TryGetFiles()?.Select(f => f.TryGetLocalPath()).FirstOrDefault(p => p != null);
+        if (path == null)
+            return;
+        _loadingDemo = true;
+        Images.SelectedItem = null;
+        _loadingDemo = false;
+        SetImage(path);
     }
 }
