@@ -61,6 +61,15 @@ Boxa boxes = binary.ConnComp(out Pixa components, 8);
 Console.WriteLine($"{boxes.Count} components");
 ```
 
+## Samples
+
+[samples](samples) has a solution with ready-to-run programs: an OCR preparation pipeline, page
+segmentation, dewarping of book pages, scans to PDF, an ASP.NET Core service with dependency
+injection, and **Explorer**, a desktop application (Windows, Linux, macOS) to try seventeen
+operations interactively.
+
+![Explorer](docs/images/explorer-page-segmentation.png)
+
 ## From the C API to C#
 
 The C documentation applies almost unchanged. Names follow a few simple rules:

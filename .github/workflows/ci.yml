@@ -145,3 +145,34 @@ jobs:
           name: package
           path: artifacts/package/*
           retention-days: 30
+
+  # The samples, built against the published NuGet package, and every console sample run once.
+  samples:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+        working-directory: samples
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build
+        run: dotnet build Leptonica.Managed.Samples.sln -c Release
+
+      - name: Run the console samples
+        run: |
+          for s in OcrPipeline ScansToPdf PageLayout Dewarp ImageBasics; do
+            echo "::group::$s"
+            dotnet run -c Release --no-build --project $s
+            echo "::endgroup::"
+          done
+          ls -R output | head -50

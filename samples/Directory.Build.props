@@ -1,0 +1,17 @@
+<Project>
+
+  <!-- Settings for the samples only: they do not use the build settings of the library. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <!-- The input images of the samples, copied next to each program. -->
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)images\*.png" Link="images\%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest" Visible="false" />
+  </ItemGroup>
+
+</Project>

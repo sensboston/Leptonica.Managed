@@ -1,0 +1,23 @@
+# Requests for the WebApi sample. Start it first: dotnet run --project samples/WebApi
+@host = http://localhost:5080
+
+### What the service runs on
+GET {{host}}/info
+
+### Clean a scanned page for OCR (the answer is a PNG)
+POST {{host}}/preprocess
+Content-Type: image/png
+
+< ../images/old-page.png
+
+### Layout of a newspaper page: text blocks, text lines and pictures
+POST {{host}}/layout
+Content-Type: image/png
+
+< ../images/newspaper.png
+
+### Not an image: 400 with a problem description
+POST {{host}}/preprocess
+Content-Type: text/plain
+
+hello
