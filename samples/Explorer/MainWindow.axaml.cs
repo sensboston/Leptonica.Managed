@@ -1,9 +1,11 @@
 using System.Diagnostics;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Leptonica;
@@ -69,6 +71,8 @@ public partial class MainWindow : Window
         // Drop an image file anywhere on the window to open it.
         AddHandler(DragDrop.DropEvent, OnDrop);
 
+        Opened += (_, _) => FitToScreen();
+
         foreach (var group in Demos.All.GroupBy(d => d.Category))
         {
             var category = new TreeViewItem { Header = group.Key, IsExpanded = true };
@@ -121,6 +125,29 @@ public partial class MainWindow : Window
 
         if (Operations.Items[0] is TreeViewItem first && first.Items[0] is TreeViewItem item)
             Operations.SelectedItem = item;
+    }
+
+    // The default size suits a large monitor; on a small or scaled screen shrink the window
+    // to the working area (title bar and borders included) and center it again.
+    private void FitToScreen()
+    {
+        Screen? screen = Screens.ScreenFromWindow(this) ?? Screens.Primary;
+        if (screen is null)
+            return;
+
+        PixelRect area = screen.WorkingArea;
+        double scale = screen.Scaling;
+        Size frame = FrameSize ?? ClientSize;
+        double chromeW = frame.Width - ClientSize.Width, chromeH = frame.Height - ClientSize.Height;
+        double maxW = area.Width / scale - chromeW, maxH = area.Height / scale - chromeH;
+        if (Width <= maxW && Height <= maxH)
+            return;
+
+        Width = Math.Max(MinWidth, Math.Min(Width, maxW));
+        Height = Math.Max(MinHeight, Math.Min(Height, maxH));
+        var size = PixelSize.FromSize(new Size(Width + chromeW, Height + chromeH), scale);
+        Position = new PixelPoint(area.X + Math.Max(0, (area.Width - size.Width) / 2),
+                                  area.Y + Math.Max(0, (area.Height - size.Height) / 2));
     }
 
     private static string GpuName() =>
