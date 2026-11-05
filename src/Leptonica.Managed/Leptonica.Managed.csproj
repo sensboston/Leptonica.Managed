@@ -10,7 +10,7 @@
 
   <PropertyGroup>
     <PackageId>Leptonica.Managed</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Description>A fully managed C# implementation of Leptonica 1.87.0, the image processing and image analysis library by Dan Bloomberg. No P/Invoke and no native binaries: the results match the C library, and the PNG, JPEG, TIFF, GIF, WebP, JPEG 2000, BMP and PNM codecs are included. SIMD, multithreading and optional GPU acceleration.</Description>
     <PackageTags>leptonica;image-processing;image-analysis;document-image;ocr;morphology;binarization;deskew;tiff;png;jpeg</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>

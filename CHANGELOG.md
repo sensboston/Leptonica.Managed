@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.1
 
 - GPU kernels are compiled without loading debug symbols: no more first-chance
   `BadImageFormatException` messages in the debugger output when the GPU is used.
