@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
@@ -24,9 +25,34 @@ public partial class MainWindow : Window
     private int _version;
     private bool _loadingDemo;
 
+    // The named controls of MainWindow.axaml. They are looked up by name instead of using the
+    // generated fields, so that the sample builds with every .NET SDK from 8 on.
+    private readonly TreeView Operations;
+    private readonly ComboBox Images;
+    private readonly Button OpenButton, SaveButton;
+    private readonly CheckBox UseGpu;
+    private readonly TextBlock Status, TitleText, Description, NoteText, ImageInfo, Busy;
+    private readonly StackPanel Parameters;
+    private readonly Image Original, Result;
+
     public MainWindow()
     {
-        InitializeComponent();
+        AvaloniaXamlLoader.Load(this);
+        T Get<T>(string name) where T : Control => this.FindControl<T>(name) ?? throw new InvalidOperationException(name);
+        Operations = Get<TreeView>("Operations");
+        Images = Get<ComboBox>("Images");
+        OpenButton = Get<Button>("OpenButton");
+        SaveButton = Get<Button>("SaveButton");
+        UseGpu = Get<CheckBox>("UseGpu");
+        Status = Get<TextBlock>("Status");
+        TitleText = Get<TextBlock>("TitleText");
+        Description = Get<TextBlock>("Description");
+        NoteText = Get<TextBlock>("NoteText");
+        ImageInfo = Get<TextBlock>("ImageInfo");
+        Busy = Get<TextBlock>("Busy");
+        Parameters = Get<StackPanel>("Parameters");
+        Original = Get<Image>("Original");
+        Result = Get<Image>("Result");
 
         foreach (var group in Demos.All.GroupBy(d => d.Category))
         {

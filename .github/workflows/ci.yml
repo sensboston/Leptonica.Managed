@@ -165,6 +165,11 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      # The samples promise to build with the .NET 8 SDK (Visual Studio 2022): use exactly that,
+      # not a newer SDK that the runner may have installed.
+      - name: Use the .NET 8 SDK
+        run: echo '{"sdk":{"version":"8.0.100","rollForward":"latestFeature"}}' > global.json && dotnet --version
+
       - name: Build
         run: dotnet build Leptonica.Managed.Samples.sln -c Release
 

@@ -4,6 +4,10 @@
     <OutputType>WinExe</OutputType>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <!-- The Avalonia source generators need a newer C# compiler than the .NET 8 SDK has; the
+         sample does not use them (see MainWindow.axaml.cs), so it builds with any SDK from 8 on. -->
+    <AvaloniaNameGeneratorIsEnabled>false</AvaloniaNameGeneratorIsEnabled>
+    <NoWarn>$(NoWarn);CS9057</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
