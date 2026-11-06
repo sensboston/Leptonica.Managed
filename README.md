@@ -134,8 +134,8 @@ regular Release build of Leptonica 1.87.0 (MSVC with the codecs from vcpkg on Wi
 the system codecs on Linux), running on one thread as it does.
 
 These are synthetic numbers for single operations, not a promise for every workload: most
-operations are faster than in C, and some are slower, the JPEG codec and the TIFF G4 decoder in
-particular, and more of them on ARM64. Every operation on every machine is listed in
+operations are faster than in C, and some are slower, the JPEG encoder in particular, and more
+of them on ARM64. Every operation on every machine is listed in
 [docs/benchmarks.md](docs/benchmarks.md), including the slower ones; the benchmark programs
 are in [benchmarks](benchmarks).
 
