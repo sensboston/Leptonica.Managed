@@ -2,8 +2,13 @@
 
 ## 1.0.1
 
+- Faster JPEG decoding: a new baseline Huffman decoder, bit-exact with the previous one
+  (decoding marge.jpg takes about 15% less time on one thread).
+- Faster TIFF G4 decoding: a new CCITT Group 4 decoder, bit-exact with the previous one,
+  messages and damaged-data behaviour included (reading a G4 page takes about a third less time).
 - GPU kernels are compiled without loading debug symbols: no more first-chance
   `BadImageFormatException` messages in the debugger output when the GPU is used.
+- Explorer sample: the window fits the screen's working area on small or scaled screens.
 
 ## 1.0.0
 
