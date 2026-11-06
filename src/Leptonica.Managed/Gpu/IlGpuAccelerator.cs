@@ -71,6 +71,35 @@ internal sealed partial class IlGpuAccelerator : IGpuAccelerator
     /// <inheritdoc/>
     public bool IsHardwareGpu => BackendKind is GpuBackendKind.Cuda or GpuBackendKind.OpenCL;
 
+    private static void ConfigureContext(Context.Builder builder)
+    {
+        builder.Default();
+        builder.Math(MathMode.Default);
+        builder.Optimize(OptimizationLevel.O1);
+        // Kernels are compiled without debug symbols: loading the PDB files of the source
+        // assemblies costs time and is only useful to debug the kernels themselves. With a
+        // debugger attached ILGPU would otherwise load them, and for every assembly without a
+        // portable PDB it throws (and catches) a BadImageFormatException.
+        SetDebugSymbolsMode(builder, DebugSymbolsMode.Disabled);
+    }
+
+    // ILGPU 1.5.x: Context.Builder.DebugSymbols only validates its argument and never stores it
+    // (ILGPU issue #1155), so the mode stays Auto, which becomes Basic under a debugger. The
+    // property setter is protected; it is called directly instead.
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "set_DebugSymbolsMode")]
+    private static extern void SetDebugSymbolsModeUnsafe(ContextProperties properties, DebugSymbolsMode mode);
+
+    /// <summary>Sets the debug symbols mode of a context being built; falls back to the builder method
+    /// if a later ILGPU no longer has the setter.</summary>
+    internal static void SetDebugSymbolsMode(Context.Builder builder, DebugSymbolsMode mode)
+    {
+        try {
+            SetDebugSymbolsModeUnsafe(builder, mode);
+        } catch (MissingMethodException) {
+            builder.DebugSymbols(mode);
+        }
+    }
+
     /// <summary>
     /// Creates an <see cref="IlGpuAccelerator"/> using the requested backend discovery policy.
     /// In <see cref="GpuBackendPreference.Auto"/> mode, probes CUDA → OpenCL → CPU fallback.
@@ -79,14 +108,7 @@ internal sealed partial class IlGpuAccelerator : IGpuAccelerator
         GpuBackendPreference preference = GpuBackendPreference.Auto,
         long maxPooledVramBytes = 256L * 1024 * 1024)
     {
-        Context context = Context.Create(builder => {
-            builder.Default();
-            builder.Math(MathMode.Default);
-            builder.Optimize(OptimizationLevel.O1);
-            // Kernels are compiled without debug symbols: loading the PDB files of the source
-            // assemblies costs time and is only useful to debug the kernels themselves.
-            builder.DebugSymbols(DebugSymbolsMode.Disabled);
-        });
+        Context context = Context.Create(ConfigureContext);
 
         try {
             Accelerator? acc = null;
@@ -147,12 +169,7 @@ internal sealed partial class IlGpuAccelerator : IGpuAccelerator
 
         Context? context = null;
         try {
-            context = Context.Create(builder => {
-                builder.Default();
-                builder.Math(MathMode.Default);
-                builder.Optimize(OptimizationLevel.O1);
-                builder.DebugSymbols(DebugSymbolsMode.Disabled);
-            });
+            context = Context.Create(ConfigureContext);
 
             Accelerator? acc = null;
             GpuBackendKind kind = GpuBackendKind.None;
