@@ -298,6 +298,7 @@ namespace BitMiracle.LibTiff.Classic.Internal
         {
             m_bit = 0; // force initial read
             m_data = 0;
+            m_fastData = 0;
             m_EOLcnt = 0; // force initial scan for EOL
 
             // Decoder assumes lsb-to-msb bit order. Note that we select this here rather than in
@@ -2446,6 +2447,13 @@ namespace BitMiracle.LibTiff.Classic.Internal
         private bool Fax4Decode(byte[] buffer, int offset, int count)
         {
             const string module = "Fax4Decode";
+
+            // The fast decoder draws rows itself, so it applies only with the default fill.
+            if (!DisableFastFax4Decoder && fill != null && fill.Target == null &&
+                fill.Method.Name == nameof(fax3FillRuns) && fill.Method.DeclaringType == typeof(CCITTCodec))
+            {
+                return Fax4DecodeFast(buffer, offset, count);
+            }
 
             while (count > 0)
             {
