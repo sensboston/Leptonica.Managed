@@ -21,7 +21,7 @@ namespace BitMiracle.LibJpeg.Classic.Internal
     /// The savable_state subrecord contains fields that change within an MCU,
     /// but must not be updated permanently until we complete the MCU.
     /// </summary>
-    class huff_entropy_decoder : jpeg_entropy_decoder
+    partial class huff_entropy_decoder : jpeg_entropy_decoder
     {
         /* Fetching the next N bits from the input stream is a time-critical operation
         * for the Huffman decoders. Note that N (the number of bits
@@ -217,6 +217,8 @@ namespace BitMiracle.LibJpeg.Classic.Internal
         /// </summary>
         public override void start_pass()
         {
+            m_fast = null;
+
             if (m_cinfo.m_progressive_mode)
             {
                 bool bad = false;
@@ -484,6 +486,12 @@ namespace BitMiracle.LibJpeg.Classic.Internal
 
                 /* Initialize restart counter */
                 m_restarts_to_go = m_cinfo.m_restart_interval;
+
+                if (m_cinfo.lim_Se == JpegConstants.DCTSIZE2 - 1 && UseFastDecoder)
+                {
+                    m_fast = new FastBaselineDecoder(this);
+                    decode_mcu = decode_mcu_fast;
+                }
             }
         }
 
@@ -1137,7 +1145,16 @@ namespace BitMiracle.LibJpeg.Classic.Internal
         {
             /* Throw away any unused bits remaining in bit buffer. */
             /* include any full bytes in next_marker's count of discarded bytes */
-            m_cinfo.m_marker.SkipBytes(m_bitstate.bits_left / 8);
+            if (m_fast != null)
+            {
+                m_cinfo.m_marker.SkipBytes(m_fast.UnusedBytes);
+                m_fast.DiscardBits();
+            }
+            else
+            {
+                m_cinfo.m_marker.SkipBytes(m_bitstate.bits_left / 8);
+            }
+
             m_bitstate.bits_left = 0;
         }
 

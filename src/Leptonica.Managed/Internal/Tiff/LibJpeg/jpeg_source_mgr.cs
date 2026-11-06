@@ -38,6 +38,31 @@ namespace BitMiracle.LibJpeg.Classic
         }
 
         /// <summary>
+        /// Reads the next eight bytes of the buffer as one big-endian word, without consuming
+        /// them, when that many are buffered; otherwise returns false and leaves the bytes to
+        /// <see cref="GetByte"/>.  Used by the fast Huffman decoder.
+        /// </summary>
+        internal bool TryPeek8(out ulong word)
+        {
+            if (m_bytes_in_buffer < 8)
+            {
+                word = 0;
+                return false;
+            }
+
+            word = System.Buffers.Binary.BinaryPrimitives.ReadUInt64BigEndian(
+                new System.ReadOnlySpan<byte>(m_next_input_byte, m_position, 8));
+            return true;
+        }
+
+        /// <summary>Consumes <paramref name="count"/> buffered bytes (at most what <see cref="TryPeek8"/> saw).</summary>
+        internal void Consume(int count)
+        {
+            m_position += count;
+            m_bytes_in_buffer -= count;
+        }
+
+        /// <summary>
         /// Skip data - used to skip over a potentially large amount of
         /// uninteresting data (such as an APPn marker).
         /// </summary>
